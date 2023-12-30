@@ -4,6 +4,7 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -11,7 +12,8 @@ async function bootstrap() {
     new FastifyAdapter(),
   );
 
+  app.useGlobalPipes(new ValidationPipe());
   await app.listen(3000);
 }
 
-bootstrap();
+bootstrap().then(() => console.log('NestJS started'));
