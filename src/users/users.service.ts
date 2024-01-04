@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma.service';
@@ -9,6 +9,10 @@ export class UsersService {
   constructor(private prisma: PrismaService) {}
 
   async create(createUserDto: CreateUserDto) {
+    if (await this.findOneByEmail(createUserDto.email)) {
+      throw new UnprocessableEntityException('Email already exists');
+    }
+
     createUserDto.password = await hash(createUserDto.password, 10);
     return this.prisma.user.create({ data: createUserDto });
   }

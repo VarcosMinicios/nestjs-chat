@@ -10,6 +10,7 @@ import {
 import { SingInDto } from './dto/sing-in.dto';
 import { AuthService } from './auth.service';
 import { RefreshJwtGuard } from './guards/refresh-jwt-auth.guard';
+import { CreateUserDto } from '../users/dto/create-user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -17,8 +18,13 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  async login(@Body() signInDto: SingInDto) {
+  async singIn(@Body() signInDto: SingInDto) {
     return await this.authService.singIn(signInDto.email, signInDto.password);
+  }
+
+  @Post('register')
+  async singUp(@Body() createUserDto: CreateUserDto) {
+    return await this.authService.singUp(createUserDto);
   }
 
   @UseGuards(RefreshJwtGuard)
