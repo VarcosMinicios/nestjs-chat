@@ -1,12 +1,14 @@
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { PrismaService } from '../prisma.service';
 import { hash } from 'bcrypt';
+import { InjectModel } from '@nestjs/mongoose';
+import { User } from '../schemas/users.schema';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
   async create(createUserDto: CreateUserDto) {
     if (await this.findOneByEmail(createUserDto.email)) {
@@ -14,19 +16,19 @@ export class UsersService {
     }
 
     createUserDto.password = await hash(createUserDto.password, 10);
-    return this.prisma.user.create({ data: createUserDto });
+    return this.userModel.create(createUserDto);
   }
 
   async findAll() {
-    return this.prisma.user.findMany();
+    return this.userModel.find();
   }
 
   async findOne(id: string) {
-    return this.prisma.user.findUnique({ where: { id } });
+    return this.userModel.findOne({ _id: id });
   }
 
   async findOneByEmail(email: string) {
-    return this.prisma.user.findUnique({ where: { email } });
+    return this.userModel.findOne({ email });
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
@@ -34,10 +36,13 @@ export class UsersService {
       updateUserDto.password = await hash(updateUserDto.password, 10);
     }
 
-    return this.prisma.user.update({ where: { id }, data: updateUserDto });
+    return this.userModel.findOneAndUpdate(
+      { _id: id },
+      { $set: updateUserDto },
+    );
   }
 
   async remove(id: string) {
-    return this.prisma.user.delete({ where: { id } });
+    return this.userModel.deleteOne({ _id: id });
   }
 }
