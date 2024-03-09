@@ -19,6 +19,8 @@ export class MessagesController {
       chatId,
       request.user.id,
       whatsappId,
+      (request.query as any).lastIndex,
+      (request.query as any).limit,
     );
   }
 }

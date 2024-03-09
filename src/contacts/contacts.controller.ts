@@ -17,6 +17,8 @@ export class ContactsController {
     return this.contactsService.findUserContacts(
       whatsappId,
       request.user.id,
+      (request.query as any).lastIndex,
+      (request.query as any).limit,
       (request.query as any).search,
     );
   }

@@ -36,12 +36,22 @@ export class MessagesService {
     return this.messageModel.bulkWrite(messagesToCreate);
   }
 
-  async findChatMessages(chatId: string, userId: string, whatsappId: string) {
-    return this.messageModel.find({
-      'key.remoteJid': chatId,
-      userId,
-      whatsappId,
-    });
+  async findChatMessages(
+    chatId: string,
+    userId: string,
+    whatsappId: string,
+    lastIndex: number,
+    limit: number,
+  ) {
+    return this.messageModel
+      .find({
+        'key.remoteJid': chatId,
+        userId,
+        whatsappId,
+      })
+      .limit(limit)
+      .skip(lastIndex * limit)
+      .sort({ messageTimestamp: -1 });
   }
 
   async findOne(key: WAMessageKey) {

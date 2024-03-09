@@ -35,7 +35,13 @@ export class ContactsService {
     return this.chatModel.bulkWrite(chatsToCreate);
   }
 
-  async findUserContacts(whatsappId: string, userId: string, search?: string) {
+  async findUserContacts(
+    whatsappId: string,
+    userId: string,
+    lastIndex: number,
+    limit: number,
+    search?: string,
+  ) {
     const filter: FilterQuery<Chat> = { userId, whatsappId };
 
     if (search) {
@@ -45,7 +51,10 @@ export class ContactsService {
       ];
     }
 
-    return this.chatModel.find(filter);
+    return this.chatModel
+      .find(filter)
+      .limit(limit)
+      .skip(lastIndex * limit);
   }
 
   async findOne(chatId: string) {
